@@ -60,7 +60,7 @@ int main(int argc, char * argv[]){
         } else { puts("[-] Python3 is not on the machine.");}
         if(EXISTS("/usr/bin/perl")){
                 puts("[+] Perl is on the machine.");   
-        } else{ puts("[-] Perl os not on the machine.");}
+        } else{ puts("[-] Perl is not on the machine.");}
         
         // FIND OS INFO
         struct utsname uts;
